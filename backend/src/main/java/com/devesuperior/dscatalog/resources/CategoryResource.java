@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import com.devesuperior.dscatalog.entities.Category;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /*
  * Annotation from rest
@@ -14,6 +15,9 @@ import com.devesuperior.dscatalog.entities.Category;
 @RequestMapping(value = "/categories")
 public class CategoryResource {
 
+	/*
+	 * End point rest
+	 */
 	@GetMapping
 	public ResponseEntity<List<Category>> findAll() {
 		List<Category> list = new ArrayList<>();
