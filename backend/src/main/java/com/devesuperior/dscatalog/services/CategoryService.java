@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.devesuperior.dscatalog.entities.Category;
 import com.devesuperior.dscatalog.repositories.CategoryRepository;
@@ -24,6 +25,12 @@ public class CategoryService {
 	@Autowired
 	private CategoryRepository repository;
 	
+	/*
+	 * Garantir a integridade da transacao JPA, ou seja, com o banco de dados
+	 * Ou faz tudo ou nao Faz nada ...
+	 * passar o parametro, readOnly=true para evitar lock no banco
+	 */
+	@Transactional(readOnly = true)
 	public List<Category> findAll() {
 		return repository.findAll();
 
