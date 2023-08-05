@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.devesuperior.dscatalog.dto.CategoryDTO;
 import com.devesuperior.dscatalog.entities.Category;
 import com.devesuperior.dscatalog.repositories.CategoryRepository;
-import com.devesuperior.dscatalog.services.exceptions.EntityNotFoundException;
+import com.devesuperior.dscatalog.services.exceptions.ResourceEntityNotFoundException;
 
 /*
  * Esta anotação vai registrar a classe, abaixo, como um componente que vai participar 
@@ -65,11 +67,11 @@ public class CategoryService {
 		return list.stream().map(x -> new CategoryDTO(x)).collect(Collectors.toList());
 
 	}
-	
+
 	@Transactional(readOnly = true)
 	public CategoryDTO findById(Long id) {
 		Optional<Category> obj = repository.findById(id);
-		Category entity = obj.orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+		Category entity = obj.orElseThrow(() -> new ResourceEntityNotFoundException("Entity not found"));
 		return new CategoryDTO(entity);
 	}
 
@@ -81,4 +83,22 @@ public class CategoryService {
 		return new CategoryDTO(entity);
 	}
 
+	@Transactional
+	public CategoryDTO update(Long id, CategoryDTO dto) {
+		// o metodo, getOne, guarda provisoriamente o ID no objeto, evitando de ir ao
+		// banco e
+		// só vai ocorrer quando for para fazer o update
+
+		try {
+		
+			Category entity = repository.getOne(id);
+			entity.setName(dto.getName());
+			// Agora, vamos salva la no banco de dados
+			entity = repository.save(entity);
+			return new CategoryDTO(entity);
+		
+		} catch (EntityNotFoundException e) {
+			throw new ResourceEntityNotFoundException("Id not found " + id);
+		}
+	}
 }
