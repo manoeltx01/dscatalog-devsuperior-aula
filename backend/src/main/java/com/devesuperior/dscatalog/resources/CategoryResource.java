@@ -16,6 +16,9 @@ import com.devesuperior.dscatalog.services.CategoryService;
  * Annotation from rest
  */
 @RestController
+/*
+ * End point, rota basica
+ */
 @RequestMapping(value = "/categories")
 public class CategoryResource {
 
@@ -28,6 +31,9 @@ public class CategoryResource {
 	@Autowired
 	private CategoryService service;
 
+	/*
+	 * End point, refrente a todas as categorias, ou seja, uma rota
+	 */
 	@GetMapping
 	public ResponseEntity<List<CategoryDTO>> findAll() {
 		List<CategoryDTO> list = service.findAll();
@@ -43,9 +49,12 @@ public class CategoryResource {
 
 	}
 
+	/*
+	 * End point, referente a um categoria em específico, ou seja, outra rota
+	 */
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<CategoryDTO> findById(@PathVariable Long id) {
-		CategoryDTO dto = service.findByIdid(id);
+		CategoryDTO dto = service.findById(id);
 		return ResponseEntity.ok().body(dto);
 	}
 }

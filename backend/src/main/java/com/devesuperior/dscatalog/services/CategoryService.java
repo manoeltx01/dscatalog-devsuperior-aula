@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.devesuperior.dscatalog.dto.CategoryDTO;
 import com.devesuperior.dscatalog.entities.Category;
 import com.devesuperior.dscatalog.repositories.CategoryRepository;
+import com.devesuperior.dscatalog.services.exceptions.EntityNotFoundException;
 
 /*
  * Esta anotação vai registrar a classe, abaixo, como um componente que vai participar 
@@ -66,9 +67,9 @@ public class CategoryService {
 	}
 	
 	@Transactional(readOnly = true)
-	public CategoryDTO findByIdid(Long id) {
+	public CategoryDTO findById(Long id) {
 		Optional<Category> obj = repository.findById(id);
-		Category entity = obj.get();
+		Category entity = obj.orElseThrow(() -> new EntityNotFoundException("Entity not found"));
 		return new CategoryDTO(entity);
 	}
 
