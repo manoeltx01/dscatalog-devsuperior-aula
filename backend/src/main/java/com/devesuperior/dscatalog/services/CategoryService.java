@@ -7,12 +7,15 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.devesuperior.dscatalog.dto.CategoryDTO;
 import com.devesuperior.dscatalog.entities.Category;
 import com.devesuperior.dscatalog.repositories.CategoryRepository;
+import com.devesuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devesuperior.dscatalog.services.exceptions.ResourceEntityNotFoundException;
 
 /*
@@ -100,5 +103,22 @@ public class CategoryService {
 		} catch (EntityNotFoundException e) {
 			throw new ResourceEntityNotFoundException("Id not found " + id);
 		}
+	}
+
+	/*
+	 * Sem @TRANSACTIONAL, pois preciso capturar algo no banco e para tal, elimino esta anotacao
+	 */
+	public void delete(Long id) {
+		try {
+		repository.deleteById(id);
+		}
+		catch(EmptyResultDataAccessException e) {
+			throw new ResourceEntityNotFoundException("Id no found " + id);
+		}
+		catch (DataIntegrityViolationException e) {
+			throw new DatabaseException("Integrity violation");
+		}
+		
+		;
 	}
 }
