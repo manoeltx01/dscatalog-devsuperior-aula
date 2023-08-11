@@ -1,14 +1,14 @@
 package com.devesuperior.dscatalog.services;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,34 +40,9 @@ public class CategoryService {
 	 * no banco
 	 */
 	@Transactional(readOnly = true)
-	public List<CategoryDTO> findAll() {
-		// Da erro tem q ser reescrita return repository.findAll();
-
-		List<Category> list = repository.findAll();
-
-		/*
-		 * Usar funcao lambida, em vez da opcao abaixo Trabalha com lista depois stream
-		 * e volta para lista de novo
-		 */
-
-		// List<CategoryDTO> listDto = list.stream().map( x -> new
-		// CategoryDTO(x)).collect(Collectors.toList());
-
-		/*
-		 * Carregar Category Entity no DTO foi substituido pelo stream acima
-		 */
-		// List<CategoryDTO> listDto = new ArrayList<>();
-		// for (Category cat : list) {
-		// listDto.add(new CategoryDTO(cat));
-		// }
-
-		// return listDto;
-
-		/*
-		 * Usando o return direto
-		 */
-
-		return list.stream().map(x -> new CategoryDTO(x)).collect(Collectors.toList());
+	public Page<CategoryDTO> findAllPaged(PageRequest pageRequest) {
+		Page<Category> list = repository.findAll(pageRequest);
+		return list.map(x -> new CategoryDTO(x));
 
 	}
 
@@ -93,32 +68,31 @@ public class CategoryService {
 		// só vai ocorrer quando for para fazer o update
 
 		try {
-		
+
 			Category entity = repository.getOne(id);
 			entity.setName(dto.getName());
 			// Agora, vamos salva la no banco de dados
 			entity = repository.save(entity);
 			return new CategoryDTO(entity);
-		
+
 		} catch (EntityNotFoundException e) {
 			throw new ResourceEntityNotFoundException("Id not found " + id);
 		}
 	}
 
 	/*
-	 * Sem @TRANSACTIONAL, pois preciso capturar algo no banco e para tal, elimino esta anotacao
+	 * Sem @TRANSACTIONAL, pois preciso capturar algo no banco e para tal, elimino
+	 * esta anotacao
 	 */
 	public void delete(Long id) {
 		try {
-		repository.deleteById(id);
-		}
-		catch(EmptyResultDataAccessException e) {
+			repository.deleteById(id);
+		} catch (EmptyResultDataAccessException e) {
 			throw new ResourceEntityNotFoundException("Id no found " + id);
-		}
-		catch (DataIntegrityViolationException e) {
+		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException("Integrity violation");
 		}
-		
+
 		;
 	}
 }
